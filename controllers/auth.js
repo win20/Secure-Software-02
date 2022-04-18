@@ -7,6 +7,8 @@ const { promisify } = require('util')
 
 const { request } = require('express');
 
+var currentUser 
+
 const db = mysql.createConnection({
     host: process.env.DATABASE_HOST,
     user: process.env.DATABASE_USER,
@@ -16,7 +18,7 @@ const db = mysql.createConnection({
 
 
 exports.register = (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
 
     const { name, email, password, passwordConfirm } = req.body;
 
@@ -80,7 +82,7 @@ exports.login = async (req, res) => {
                     expiresIn: process.env.JWT_EXPIRES_IN
                 })
 
-                console.log('The token is:' + token)
+                // console.log('The token is:' + token)
                 const cookieOptions = {
                     expires: new Date(Date.now + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000),
                     httpOnly: true
@@ -97,22 +99,23 @@ exports.login = async (req, res) => {
 }
 
 exports.isLoggedIn = async (req, res, next) => {
-    console.log(req.cookies)
+    // console.log(req.cookies)
     if (req.cookies.jwt) {
         try {
             // verify the token
             const decoded = await promisify(jwt.verify) (req.cookies.jwt, process.env.JWT_SECRET)
-            console.log(decoded)
+            // console.log(decoded)
 
             // check is the user still exists
             db.query('SELECT * FROM users WHERE id = ?', [ decoded.id ], (error, result) => {
-                console.log(result)
+                // console.log(result)
 
                 if (!result) {
                     return next()
                 }
 
                 req.user = result[0]
+                currentUser = result[0]
                 return next()
             })
         }
@@ -125,11 +128,47 @@ exports.isLoggedIn = async (req, res, next) => {
 } 
 
 exports.logout = async (req, res) => {
-    // res.cookie('jwt', 'logout', {
-    //     expires: new Date(Date.now() + 2 * 1000),
-    //     httpOnly: true          // good against online attacks (SSH)
-    // })
-
     res.clearCookie('jwt')
     res.status(200).redirect('/')
+}
+
+exports.postArticle = (req, res) => {
+
+    const { title, description, article } = req.body
+    var author = currentUser.name
+
+    db.query('INSERT INTO blogposts SET ? ', { title: title, description: description, article: article, author: author }, (error, results) => {
+        if (error) {
+            console.log(error);
+        }
+        else {
+            return res.render('postArticle', {
+                message: 'Article posted successfully'
+            });
+        }
+    });
+}
+
+function HelloWorld() {
+
+}
+
+exports.getBlogPosts = (req, res, next) => {
+
+    db.query('SELECT * FROM blogposts', (error, results) => {
+        
+        if (error){
+            console.log(error)
+        }
+
+        if (!results) {
+            return next()
+        }
+        
+        // console.log(results)
+        req.posts = results[2]
+        console.log(req.posts)
+        
+        return next()         
+    })  
 }
