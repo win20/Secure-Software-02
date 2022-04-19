@@ -2,41 +2,44 @@ const express = require('express');
 const session = require('express-session')
 const router = express.Router();
 const authController = require('../controllers/auth');
+const Article = require('../models/Article');
 
 
 router.get('/', authController.isLoggedIn, (req, res) => {
 
-    res.render('index', {
+    res.render('index.hbs', {
         user: req.user
     });
 });
 
 router.get('/register', (req, res) => {
-    res.render('register');
+    res.render('register.hbs');
 });
 
 router.get('/login', (req, res) => {
-    res.render('login');
+    res.render('login.hbs');
 });
 
 router.get('/profile', authController.isLoggedIn, (req, res) => {
     if (req.user) {
-        res.render('profile', {
+        res.render('profile.hbs', {
             user: req.user
         });
     }
     else {
-        res.redirect('/login');
+        res.redirect('/login.hbs');
     }
 });
 
 router.get('/blogPosts', authController.isLoggedIn, authController.getBlogPosts, (req, res) => {
     
-    res.render('blogPosts', {
+    res.render('blogPosts.hbs', {
         user: req.user,
         posts: req.posts
     });
 });
+
+
 
 router.get('/postArticle', authController.isLoggedIn, (req, res) => {
     if (req.user) {
@@ -50,5 +53,6 @@ router.get('/postArticle', authController.isLoggedIn, (req, res) => {
         });
     }
 });
+
 
 module.exports = router;

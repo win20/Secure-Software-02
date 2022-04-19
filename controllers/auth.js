@@ -29,12 +29,12 @@ exports.register = (req, res) => {
         } 
 
         if (results.length > 0) {
-            return res.render('register', {
+            return res.render('register.hbs', {
                 message: 'That email is already in use'
             });
         }
         else if (password != passwordConfirm) {
-            return res.render('register', {
+            return res.render('register.hbs', {
                 message: 'The passwords do not match'
             });
         }
@@ -48,7 +48,7 @@ exports.register = (req, res) => {
                 console.log(error);
             }
             else {
-                return res.render('register', {
+                return res.render('register.hbs', {
                     message: 'User Registered'
                 });
             }
@@ -63,7 +63,7 @@ exports.login = async (req, res) => {
         const { email, password } = req.body
 
         if (!email || !password) {
-            return res.status(400).render('login', {
+            return res.status(400).render('login.hbs', {
                 message: 'Please provide an email and password'
             })
         }
@@ -71,7 +71,7 @@ exports.login = async (req, res) => {
         db.query('SELECT * FROM users WHERE email = ?', [ email ], async (error, results) => {
             // console.log(results)
             if (!results || !(await bcrypt.compare(password, results[0].password))) {
-                res.status(401).render('login', {
+                res.status(401).render('login.hbs', {
                     message: 'Email or password is incorrect'
                 })
             }
@@ -142,16 +142,13 @@ exports.postArticle = (req, res) => {
             console.log(error);
         }
         else {
-            return res.render('postArticle', {
+            return res.render('postArticle.hbs', {
                 message: 'Article posted successfully'
             });
         }
     });
 }
 
-function HelloWorld() {
-
-}
 
 exports.getBlogPosts = (req, res, next) => {
 
