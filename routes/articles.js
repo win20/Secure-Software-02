@@ -17,15 +17,14 @@ router.get('/blog-posts', authController.isLoggedIn, async (req, res) => {
     // req.article = new Article()
 })
 
-router.get('/new', (req, res) => {
-    res.render('articles/new.ejs', { article: new Article() })
+router.get('/new', authController.isLoggedIn, (req, res) => {
+    res.render('articles/new.ejs', { article: new Article(), user: req.user })
 
 })
 
-router.get('/edit/:id', async (req, res) => {
+router.get('/edit/:id', authController.isLoggedIn, async (req, res) => {
     const article = await Article.findById(req.params.id)
-    res.render('articles/edit.ejs', { article: article })
-
+    res.render('articles/edit.ejs', { article: article, user: req.user })
 })
 
 router.put('/:id', async (req, res, next) => {
@@ -42,11 +41,11 @@ router.delete('/:id', authController.isLoggedIn, async (req, res) => {
     // res.send('delete')
 })
 
-router.get('/:slug', async (req, res) => {
+router.get('/:slug', authController.isLoggedIn, async (req, res) => {
     const article = await Article.findOne({ slug: req.params.slug })
 
     if (article == null) res.redirect('/articles/blog-posts.ejs')
-    else res.render('articles/show.ejs', { article: article })
+    else res.render('articles/show.ejs', { article: article, user: req.user })
 })
 
 

@@ -62,7 +62,7 @@ nav li a:hover {
     text-decoration: none;
 }
 
-.btn {
+/* .btn {
     background-color: #2ec4b6;
     color: #000;
     border: none;
@@ -71,6 +71,28 @@ nav li a:hover {
 .btn:hover {
     background-color: #34d6c6;
     color: #000;
+} */
+
+.btn-dark {
+    background-color: rgb(66, 66, 66);
+    border: none;
+}
+
+.btn-danger {
+    background-color: #ff5588;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #fd3470;
+}
+
+.btn-secondary {
+    border: none;
+}
+
+.card {
+    box-shadow: 1px 1px 2px rgb(179, 179, 179);
 }
 
 .avatar-ctn {
@@ -95,4 +117,15 @@ nav li a:hover {
 .btn-cancel:hover {
     background-color: rgb(102, 102, 102);
     color: #fff;
+}
+
+#markdown {
+    height: 200px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#title, #description, #markdown {
+    background-color: rgb(221, 221, 221);
+    border: none;
+    margin-top: 5px;
 }
