@@ -4,9 +4,7 @@ const router = express.Router();
 const authController = require('../controllers/auth');
 const Article = require('../models/Article');
 
-
 router.get('/', authController.isLoggedIn, (req, res) => {
-
     res.render('index.hbs', {
         user: req.user
     });
@@ -31,16 +29,6 @@ router.get('/profile', authController.isLoggedIn, (req, res) => {
     }
 });
 
-router.get('/blogPosts', authController.isLoggedIn, authController.getBlogPosts, (req, res) => {
-    
-    res.render('blogPosts.hbs', {
-        user: req.user,
-        posts: req.posts
-    });
-});
-
-
-
 router.get('/postArticle', authController.isLoggedIn, (req, res) => {
     if (req.user) {
         res.render('postArticle', {
@@ -53,6 +41,5 @@ router.get('/postArticle', authController.isLoggedIn, (req, res) => {
         });
     }
 });
-
 
 module.exports = router;

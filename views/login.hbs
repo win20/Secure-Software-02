@@ -10,7 +10,6 @@
     <title>Gym Rat | Login</title>
 </head>
 <body>
-
     <nav>
         <div id="header-logo">
             <img id="header-icon" src="/logo.png" alt="dumbbell-icon">
@@ -26,7 +25,7 @@
         </ul>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container mt-4" style="width: 80%;">
         <div class="card">
             <div class="card-header">
                 Login
@@ -48,12 +47,12 @@
             </div>
         </div>
 
+        {{!-- Show messages sent from the server-side --}}
         {{#if message }}
             <h4 class="alert alert-danger mt-4">{{message}}</h4>
         {{/if}}
     </div>
     
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 </body>
 </html>

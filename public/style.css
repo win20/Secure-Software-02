@@ -1,9 +1,12 @@
+/* Import fonts */
 @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400&display=swap');
 
 body {
     font-family: 'Lato', sans-serif;
 }
 
+
+/* ========= Header + Nav bar ========= */
 nav {
     background-color: #2ec4b6;
     color: #000;
@@ -34,6 +37,7 @@ nav {
     color: #000;
 }
 
+/* Hide header text ('Gym Rat | Fitness Blog') when screen size is too small, leaves logo */
 @media screen and (max-width: 1200px) {
     #header-logo h4 {
         display: none;
@@ -62,17 +66,8 @@ nav li a:hover {
     text-decoration: none;
 }
 
-/* .btn {
-    background-color: #2ec4b6;
-    color: #000;
-    border: none;
-}
 
-.btn:hover {
-    background-color: #34d6c6;
-    color: #000;
-} */
-
+/* ========= Button styles ========= */
 .btn-dark {
     background-color: rgb(66, 66, 66);
     border: none;
@@ -91,10 +86,22 @@ nav li a:hover {
     border: none;
 }
 
+.btn-cancel {
+    background-color: rgb(122, 122, 122);
+    color: #fff;
+}
+
+.btn-cancel:hover {
+    background-color: rgb(102, 102, 102);
+    color: #fff;
+}
+
 .card {
     box-shadow: 1px 1px 2px rgb(179, 179, 179);
 }
 
+
+/* ========= Profile page ========= */
 .avatar-ctn {
     background-color: orange;
     text-align: center;
@@ -105,18 +112,10 @@ nav li a:hover {
     border-bottom: 1px solid rgba(0,0,0,0.125);
 }
 
+
+/* ========= Article pages ========= */
 #post-article {
     height: 150px;
-}
-
-.btn-cancel {
-    background-color: rgb(122, 122, 122);
-    color: #fff;
-}
-
-.btn-cancel:hover {
-    background-color: rgb(102, 102, 102);
-    color: #fff;
 }
 
 #markdown {
