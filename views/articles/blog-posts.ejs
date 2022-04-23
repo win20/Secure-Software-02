@@ -38,9 +38,20 @@
         
         <a href="/articles/new" class="btn btn-dark">New Post</a>
 
+        <!-- Search functionality that searches for all articles with that title, with button to show all articles again -->
+        <form action="/articles/search" method="POST" class="d-inline">
+            <input type="search" class="form-control ds-input" name="search" id="search" placeholder="Search posts..." autocomplete="off" spellcheck="false">
+            <button class="btn btn-light">Search</button>
+        </form>
+
+        <a href="/articles/blog-posts">
+            <button class="btn btn-light">All Articles</button>
+        </a>
+       
+
         <!-- Display error messages if user is not signed in -->
         <% if (message) { %>
-            <p class="d-inline" style="padding-left: 5px; color: #ff5588;"><%= message %></p>
+            <p style="padding-left: 5px; color: #ff5588;"><%= message %></p>
         <% } %>
 
         <!-- Create a card element and populate the info with data pulled from database, creates a card for each article -->
@@ -54,7 +65,7 @@
                         </div>
                         <div class="card-text mb-2"><%= article.description %></div>
                         <a href="/articles/<%= article.slug %>" class="btn btn-dark">Read More</a>
-                        <a href="edit/<%= article.id %>" class="btn btn-secondary">Edit</a>
+                        <a href="/articles/edit/<%= article.id %>" class="btn btn-secondary">Edit</a>
                         <form action="/articles/<%= article.id %>?_method=DELETE" method="POST" class="d-inline">
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </form>

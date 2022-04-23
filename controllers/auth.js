@@ -5,7 +5,8 @@ const bcrypt = require('bcryptjs')
 const async = require('hbs/lib/async')
 const cookieParser = require('cookie-parser')
 const { promisify } = require('util')
-const { request } = require('express')
+const { request, response } = require('express')
+const fetch = require('isomorphic-fetch')
 
 // Store current user if logged in
 var currentUser 
@@ -23,39 +24,60 @@ const db = mysql.createConnection({
 exports.register = (req, res) => {
     const { name, email, password, passwordConfirm } = req.body
 
-    // sql query to find user using email, returns error and results to use as params in the nested function
-    // note: '?', parameterized query helps against SQL injection
-    db.query('SELECT email FROM users WHERE email = ?', [ email ], async (error, results) => {
-        if (error) {
-            console.log(error)
-        } 
+    const response_key = req.body['g-recaptcha-response']
+    const secret_key = process.env.CAPTCHA_SECRET
 
-        if (results.length > 0) {
-            return res.render('register.hbs', {
-                message: 'That email is already in use'
-            })
-        }
-        else if (password != passwordConfirm) {
-            return res.render('register.hbs', {
-                message: 'The passwords do not match'
-            })
-        }
+    const url = `https://www.google.com/recaptcha/api/siteverify?secret=${secret_key}&response=${response_key}`
 
-        // hash password
-        let hashedPassword = await bcrypt.hash(password, 8)
-
-        // send data to database
-        db.query('INSERT INTO users SET ? ', { name: name, email: email, password: hashedPassword }, (error, results) => {
-            if (error) {
-                console.log(error)
-            }
-            else {
-                return res.render('register.hbs', {
-                    successMessage: 'User Registered'
-                })
-            }
-        })
+    fetch (url, { 
+        method: 'post' 
     })
+    .then((response) => response.json())
+    .then((google_response) => {
+        if (google_response.success == true) {
+            // sql query to find user using email, returns error and results to use as params in the nested function
+            // note: '?', parameterized query helps against SQL injection
+            db.query('SELECT email FROM users WHERE email = ?', [ email ], async (error, results) => {
+                if (error) {
+                    console.log(error)
+                } 
+
+                if (results.length > 0) {
+                    return res.render('register.hbs', {
+                        message: 'That email is already in use'
+                    })
+                }
+                else if (password != passwordConfirm) {
+                    return res.render('register.hbs', {
+                        message: 'The passwords do not match'
+                    })
+                }
+
+                // hash password
+                let hashedPassword = await bcrypt.hash(password, 8)
+
+                // send data to database
+                db.query('INSERT INTO users SET ? ', { name: name, email: email, password: hashedPassword }, (error, results) => {
+                    if (error) {
+                        console.log(error)
+                    }
+                    else {
+                        return res.render('register.hbs', {
+                            successMessage: 'User Registered'
+                        })
+                    }
+                })
+            })
+          }
+          else {
+            return res.render('register.hbs', {
+                message: 'Failed Captcha.'
+            })
+          }
+      })
+      .catch((error) => {
+          return res.json({ error })
+      })
 }
 
 // Validates user inputs and compares it with data in database to authenticate user,

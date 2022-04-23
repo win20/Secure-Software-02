@@ -14,6 +14,8 @@ router.get('/blog-posts', authController.isLoggedIn, async (req, res) => {
      })
 })
 
+
+
 router.get('/new', authController.isLoggedIn, async (req, res) => {
     const articles = await Article.find().sort({ createdAt: 'desc'})
     if (req.user) {
@@ -69,6 +71,20 @@ router.get('/:slug', authController.isLoggedIn, async (req, res) => {
 
     if (article == null) res.redirect('/articles/blog-posts.ejs')
     else res.render('articles/show.ejs', { article: article, user: req.user })
+})
+
+// Implement search function, grabs the text from search bar and searches article with that title, 
+// re-render page with only the articles found. 
+router.post('/search', authController.isLoggedIn, async (req, res) => {
+    let search = req.body.search
+    const articles = await Article.find( { title: search } ).collation( { locale: "en", strength: 2 } )
+    // res.send(article)
+
+    res.render('articles/blog-posts.ejs', { 
+        articles: articles,
+        user: req.user,
+        message: ''
+    })
 })
 
 router.post('/', (req, res, next) => {
