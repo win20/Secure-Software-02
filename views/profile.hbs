@@ -47,9 +47,13 @@
                         Profile Page
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">Hey {{ user.name }} welcome back</h5>
-                        <p class="card-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem, nostrum exercitationem. Repudiandae ab</p>
-                        <a href="#" class="btn btn-primary">Go Somewhere</a>
+                        <h5 class="card-title">Hey {{ user.name }}</h5>
+                        <p class="card-text mb-4">From this page you can change your preferences</p>
+                        <h5>2FA Settings</h5>
+
+                        <a href="/profile/authenticator-setup" class="d-inline btn btn-secondary">Authenticator</a>
+                        <a href="#" class="d-inline btn btn-secondary">Email code</a>
+    
                     </div>
 
                     <div class="card-footer text-muted">
@@ -58,8 +62,6 @@
                 </div>
             </div>
         </div>
-
-        
     </div>
     
 

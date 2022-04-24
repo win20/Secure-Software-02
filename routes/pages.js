@@ -42,4 +42,8 @@ router.get('/postArticle', authController.isLoggedIn, (req, res) => {
     }
 });
 
+router.get('/profile/authenticator-setup', (req, res) => {
+    res.render('authenticator-setup.hbs', {code: ''})
+})
+
 module.exports = router;

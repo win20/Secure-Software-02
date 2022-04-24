@@ -26,6 +26,8 @@
     "mongoose": "^6.3.0",
     "mysql": "^2.18.1",
     "nodemon": "^2.0.15",
-    "slugify": "^1.6.5"
+    "qrcode": "^1.5.0",
+    "slugify": "^1.6.5",
+    "speakeasy": "^2.0.0"
   }
 }
