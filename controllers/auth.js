@@ -119,7 +119,11 @@ exports.login = async (req, res) => {
                     httpOnly: true
                 }
                 res.cookie('jwt', token, cookieOptions)
-                res.status(200).redirect('/')          
+                // res.status(200).redirect('/')
+                res.render('index.hbs', {
+                    just_logged_in: true,
+                    user: results[0]
+                })          
             }
         })
     }
@@ -160,7 +164,10 @@ exports.isLoggedIn = async (req, res, next) => {
 // Delete user cookie and redirects to home page
 exports.logout = async (req, res) => {
     res.clearCookie('jwt')
-    res.status(200).redirect('/')
+
+    res.render('index.hbs', {
+        just_logged_out: true
+    })
 }
 
 // Sets up the 2FA authentication system, generate a secret object using speakeasy,
