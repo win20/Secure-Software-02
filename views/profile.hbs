@@ -36,7 +36,7 @@
                     <div class="card-body">   
                         <h5 class="card-title">{{ user.name }}</h5>
                         <p class="card-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem, nostrum exercitationem. Repudiandae ab numquam vel necessitatibus, voluptate rem aut aperiam libero. Neque beatae error non est unde qui! Nostrum, excepturi!</p>
-                        <a href="#" class="btn btn-primary">{{ user.email }}</a>
+                        <p class="text-muted">{{ user.email }}</p>
                     </div>
                 </div>
             </div>
@@ -51,15 +51,33 @@
                         <p class="card-text mb-4">From this page you can change your preferences</p>
                         <h5>2FA Settings</h5>
 
-                        <a href="/profile/authenticator-setup" class="d-inline btn btn-secondary">Authenticator</a>
-                        <a href="#" class="d-inline btn btn-secondary">Email code</a>
-    
+                        {{#if auth_activated}}
+                            <img src="/activated.png" style="width: 10px; height: 10px;" alt="">
+                        {{/if}}
+                        
+                        <a href="/profile/authenticator-setup" class="btn btn-secondary" style="padding: 3px 5px;">Authenticator</a>
+                        <form action="/auth/reset-auth-settings" method="POST" class="d-inline">
+                            <button class="btn"><img src="/delete.png" style="width: 35px; height: 35px" alt="delte-btn"></button>
+                        </form>
+
+                        <br>
+                        {{#if otp_activated}}
+                            <img src="/activated.png" style="width: 10px; height: 10px;" alt="">
+                        {{/if}}
+                        <a href="/profile/email-otp-setup" class="btn btn-secondary" style="padding: 3px 5px;">Email code</a>
+                        <form action="/auth/reset-otp-settings" method="POST" class="d-inline">
+                            <button class="btn"><img src="/delete.png" style="width: 35px; height: 35px" alt="delte-btn"></button>
+                        </form>
                     </div>
 
                     <div class="card-footer text-muted">
                         Secure Software - Assignment 2
                     </div>
+                   
                 </div>
+                {{#if reset_msg}}
+                <p class="alert alert-success mt-3">{{reset_msg}}</p>
+                {{/if}}
             </div>
         </div>
     </div>

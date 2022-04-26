@@ -28,12 +28,12 @@
     <div class="container mt-4" style="width: 80%;">
         <div class="card">
             <div class="card-header">
-                Please verify using the code on your authenticator app
+                We've sent an email with a one-time-passcode, please verify below
             </div>
             <div class="card-body">
-                <form action="/auth/validate-code" method="POST">
+                <form action="/auth/validateEmailOTP" method="POST">
                    <div class="form-floating mb-3" style="width: 500px;">
-                        <input type="text" class="form-control" id="token" name="token" placeholder="name@example.com">
+                        <input type="text" class="form-control" id="otp" name="otp" placeholder="name@example.com">
                         <label for="floatingInput">Enter code here</label>
                     </div>
                     <button type="submit" class="btn btn-secondary d-inline">Login</button>

@@ -9,6 +9,10 @@ router.get('/logout', authController.logout);
 router.post('/set-authenticator', authController.isLoggedIn, authController.setAuthenticator)
 router.post('/verify-token', authController.isLoggedIn, authController.verifyToken)
 router.post('/validate-code', authController.validateToken)
-
+router.post('/sendOTPEmail', authController.isLoggedIn, authController.sendOTPEmail)
+router.post('/verifyEmailOTP', authController.isLoggedIn, authController.verifyEmailOTP)
+router.post('/validateEmailOTP', authController.validateEmailOTP)
+router.post('/reset-auth-settings', authController.isLoggedIn, authController.resetAuthSettings)
+router.post('/reset-otp-settings', authController.isLoggedIn, authController.resetOTPSettings)
 
 module.exports = router;

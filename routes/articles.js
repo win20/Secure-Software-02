@@ -77,8 +77,9 @@ router.get('/:slug', authController.isLoggedIn, async (req, res) => {
 // re-render page with only the articles found. 
 router.post('/search', authController.isLoggedIn, async (req, res) => {
     let search = req.body.search
-    const articles = await Article.find( { title: search } ).collation( { locale: "en", strength: 2 } )
-    // res.send(article)
+
+    // search db using regex, returns if title contains search, case insensitive
+    const articles = await Article.find({ title: new RegExp(search, 'i') })
 
     res.render('articles/blog-posts.ejs', { 
         articles: articles,

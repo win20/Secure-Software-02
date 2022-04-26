@@ -20,12 +20,26 @@ router.get('/login', (req, res) => {
 
 router.get('/profile', authController.isLoggedIn, (req, res) => {
     if (req.user) {
-        res.render('profile.hbs', {
-            user: req.user
-        });
+        if (req.user.is_auth_verified == 1) {
+            res.render('profile.hbs', {
+                user: req.user,
+                auth_activated: true              
+            });
+        }
+        else if (req.user.is_email_otp_verified) {
+            res.render('profile.hbs', {
+                user: req.user,
+                otp_activated: true              
+            });
+        }
+        else {
+            res.render('profile.hbs', {
+                user: req.user,            
+            });
+        }     
     }
     else {
-        res.redirect('/login.hbs');
+        res.redirect('/login');
     }
 });
 
@@ -44,6 +58,10 @@ router.get('/postArticle', authController.isLoggedIn, (req, res) => {
 
 router.get('/profile/authenticator-setup', (req, res) => {
     res.render('authenticator-setup.hbs', {code: ''})
+})
+
+router.get('/profile/email-otp-setup', (req, res) => {
+    res.render('email-otp-setup.hbs')
 })
 
 module.exports = router;
