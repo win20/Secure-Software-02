@@ -26,23 +26,36 @@
         </ul>
     </nav>
 
-    <div class="container mt-4" style="width: 80%;">
+    <div class="container mt-4 mb-5" style="width: 80%;">
         <div class="card">
             <div class="card-header">
                 Register Form
             </div>
+
             <div class="card-body">
                 <form action="/auth/register" method="POST">
                     <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input required type="text" class="form-control" id="name" name="name">
+                        <label for="name" class="form-label">First Name</label>
+                        <input required type="text" class="form-control" id="name" name="name" value="{{#if name}}{{name}}{{/if}}">
                         
                     </div>
 
                     <div class="mb-3">
                         <label for="email" class="form-label">Email Address</label>
-                        <input required type="email" class="form-control" id="email" name="email">
+                        <input required type="email" class="form-control" id="email" name="email" value="{{#if email}}{{email}}{{/if}}">
                     </div>
+
+                    <p>
+                        The password must : <br>
+                        <ul>
+                            <li>Be between 8 and 20 characters long</li>
+                            <li>Contain at least 1 uppercase letter</li>
+                            <li>Contain at least 1 lowercase letter</li>
+                            <li>Contain at least 1 digit</li>
+                            <li>Contain at least 1 special character</li>
+                            <li>Not have any whitespaces</li>
+                        </ul>
+                    </p>
 
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>

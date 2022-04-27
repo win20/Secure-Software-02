@@ -12,9 +12,9 @@ const qrCode = require('qrcode')
 const nodemailer = require('nodemailer')
 const { resolve } = require('path')
 const randtoken = require('rand-token')
+const expressValidator = require('express-validator')
 
-// Store current user if logged in
-var currentUser 
+// Store current email
 var userEmail
 
 // Connect sql
@@ -47,11 +47,48 @@ function generateOTP() {
     return genotp
 }
 
+// Used to validate password against criteria, return true if no errors were found, otherwise return a message
+function passwordValidation(password) {
+    const isWhitespace = /^(?=.*\s)/;
+    if (isWhitespace.test(password)) {
+        return "Password must not contain Whitespaces.";
+    }
+
+    const isContainsUppercase = /^(?=.*[A-Z])/;
+    if (!isContainsUppercase.test(password)) {
+        return "Password must have at least one Uppercase Character.";
+    }
+
+    const isContainsLowercase = /^(?=.*[a-z])/;
+    if (!isContainsLowercase.test(password)) {
+        return "Password must have at least one Lowercase Character.";
+    }
+
+    const isContainsNumber = /^(?=.*[0-9])/;
+    if (!isContainsNumber.test(password)) {
+        return "Password must contain at least one Digit.";
+    }
+
+    const isContainsSymbol =
+        /^(?=.*[~`!@#$%^&*()--+={}\[\]|\\:;"'<>,.?/_₹])/;
+    if (!isContainsSymbol.test(password)) {
+        return "Password must contain at least one special character.";
+    }
+
+    const isValidLength = /^.{8,20}$/;
+    if (!isValidLength.test(password)) {
+        return "Password must be 10-16 Characters Long.";
+    }
+    
+    return true;
+}
+
 
 // Takes data from front-end, validates and encrypts it if needed and sends to the database
 // Returns: message object to front end with different value depending on outcome
 exports.register = (req, res) => {
     const { name, email, password, passwordConfirm } = req.body
+    var message = passwordValidation(password)
 
     const response_key = req.body['g-recaptcha-response']
     const secret_key = process.env.CAPTCHA_SECRET
@@ -72,15 +109,35 @@ exports.register = (req, res) => {
 
                 if (results.length > 0) {
                     return res.render('register.hbs', {
-                        message: 'That email is already in use'
+                        message: 'That email is already in use',
+                        name,
+                        email
                     })
                 }
                 else if (password != passwordConfirm) {
                     return res.render('register.hbs', {
-                        message: 'The passwords do not match'
+                        message: 'The passwords do not match',
+                        name,
+                        email
                     })
                 }
-
+                else if (!(/^[a-zA-Z]+$/.test(name))) {
+                    return res.render('register.hbs', {
+                        message: 'Please enter only a first name and with only letters',
+                        name,
+                        email
+                    })
+                }
+                
+                else if (message != true) {
+                    return res.render('register.hbs', {
+                        message: message,
+                        name,
+                        email
+                    })
+                }
+                res.send('success')
+                
                 // hash password
                 let hashedPassword = await bcrypt.hash(password, 8)
 
@@ -100,7 +157,9 @@ exports.register = (req, res) => {
           }
           else {
             return res.render('register.hbs', {
-                message: 'Failed Captcha.'
+                message: 'Failed Captcha.',
+                name,
+                email
             })
           }
       })
@@ -453,8 +512,7 @@ function sendResetEmail(email, link) {
         html: '<p>You requested for reset password, kindly use this <a href=' + link + '>link</a> to reset your password, please note it will expire in <strong>30 minutes.</strong></p>'
  
     }
- 
-    mail.sendMail(mailOptions)
+     mail.sendMail(mailOptions)
 }
 
 // Create a jwt token using id and password, adding the password allows to make the token a one time use
@@ -481,8 +539,8 @@ exports.sendResetLink = (req, res, next) => {
         const token = makeToken(user.id, user.password)
 
         const link = `http://localhost:5000/auth/reset-password/${user.id}?token=${token}`
-        // console.log(link)
-        sendResetEmail(email, link)
+        console.log(link)
+        // sendResetEmail(email, link)
         res.render('forgot-password.hbs', { message: 'If that user exists a reset link will be sent via email' })     
     })
 }
@@ -527,16 +585,26 @@ exports.resetPassword = async (req, res) => {
     const userId = req.params.id
     const new_password = req.body.password
     const new_password2 = req.body.password2
+    var message = passwordValidation(new_password)
 
+    // check if passwords match
     if (new_password != new_password2) {
-        return res.render('reset-password.hbs', { message: 'Passwords do not match' })
+        return res.render('reset-password.hbs', { message: 'Passwords do not match', id: userId})
+    }
+    // check if password passes validation
+    else if (message != true) {
+        return res.render('reset-password.hbs', { message, id: userId })
     }
 
+    // hash and update database, this time re-render page with a message,
+    // without passing userid so they can't reset password again straight away
     let hashedPassword = await bcrypt.hash(new_password, 8)
     db.query(`UPDATE users_test SET ? WHERE id = ${userId}`, { password: hashedPassword })
     res.render('reset-password.hbs', { success_message: 'Password successfully reset' })
 }
 
+// When not passing userId the website will redirect to /auth/reset-password, 
+// with the missing ID, the page will just re-render with the appropriate message
 exports.passResetError = (req, res) => {
     res.render('reset-password.hbs', { message: 'You have already reset your password, please login, or request another link' })
 }
