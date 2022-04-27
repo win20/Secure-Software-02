@@ -4,6 +4,17 @@ const router = express.Router();
 const authController = require('../controllers/auth');
 const Article = require('../models/Article');
 
+const mysql = require('mysql')
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs')
+
+const db = mysql.createConnection({
+    host: process.env.DATABASE_HOST,
+    user: process.env.DATABASE_USER,
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE
+})
+
 router.get('/', authController.isLoggedIn, (req, res) => {
     res.render('index.hbs', {
         user: req.user
@@ -63,5 +74,10 @@ router.get('/profile/authenticator-setup', (req, res) => {
 router.get('/profile/email-otp-setup', (req, res) => {
     res.render('email-otp-setup.hbs')
 })
+
+router.get('/forgot-password', (req, res) => {
+    res.render('forgot-password.hbs')  
+})
+
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const Article = require('./../models/Article')
-const authController = require('../controllers/auth');
+const authController = require('../controllers/auth')
 const marked = require('marked')
 const slugify = require('slugify')
 

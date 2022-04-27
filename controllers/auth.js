@@ -10,6 +10,8 @@ const fetch = require('isomorphic-fetch')
 const speakeasy = require('speakeasy')
 const qrCode = require('qrcode')
 const nodemailer = require('nodemailer')
+const { resolve } = require('path')
+const randtoken = require('rand-token')
 
 // Store current user if logged in
 var currentUser 
@@ -23,8 +25,8 @@ const db = mysql.createConnection({
     database: process.env.DATABASE
 })
 
+// Create OTP and transporter to send OTP email
 var otp = 0
-
 var email
 var transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -37,6 +39,7 @@ var transporter = nodemailer.createTransport({
     }
 })
 
+// Generate OTP
 function generateOTP() {
     genotp = Math.random()
     genotp = genotp * 100000;
@@ -107,6 +110,12 @@ exports.register = (req, res) => {
 }
 
 
+// Utility function to create delay
+function delay(time) {
+    return new Promise(resolve => setTimeout(resolve, time))
+}
+
+
 // Validates user inputs and compares it with data in database to authenticate user,
 // once logged in a cookie using web tokens is created to store the users data while the session is active.
 // Returns: sends messages to front-end as well as user data if they manage to log in.
@@ -123,7 +132,9 @@ exports.login = async (req, res) => {
         // note: sends same message regardless of email failure or password failure or both
         db.query('SELECT * FROM users_test WHERE email = ?', [ email ], async (error, results) => {
             if (results < 1) {
-                res.status(401).render('login.hbs', {message: 'Email or password is incorrect'})
+                // equalize the server response times
+                delay(20).then(() => res.status(401).render('login.hbs', {message: 'Email or password is incorrect'}))
+                // res.status(401).render('login.hbs', {message: 'Email or password is incorrect'})
             }
             else if (!(await bcrypt.compare(password, results[0].password))) {
                 res.status(401).render('login.hbs', {message: 'Email or password is incorrect'})
@@ -419,4 +430,113 @@ exports.resetOTPSettings = (req, res) => {
     db.query(`UPDATE users_test SET ? WHERE id = ${userId}`, { is_email_otp_verified: 0 })
     res.render('profile.hbs', { reset_msg: 'Successfully reset your settings', user: req.user })
 }
-/******************************/
+// =========================================
+
+
+//============= PASSWORD RESET =============
+
+// Create email and set mail options, then send when called
+function sendResetEmail(email, link) {
+    
+    var mail = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.OTP_EMAIL,
+            pass: process.env.OTP_PASS
+        }
+    })
+
+    var mailOptions = {
+        from: process.env.OTP_EMAIL,
+        to: email,
+        subject: 'Reset Password Link',
+        html: '<p>You requested for reset password, kindly use this <a href=' + link + '>link</a> to reset your password, please note it will expire in <strong>30 minutes.</strong></p>'
+ 
+    }
+ 
+    mail.sendMail(mailOptions)
+}
+
+// Create a jwt token using id and password, adding the password allows to make the token a one time use
+function makeToken (id, password) {
+    return jwt.sign({ id, password }, process.env.JWT_SECRET, {expiresIn: '30m'})
+}
+
+// Look for user from email input, if it exists make a token and link and send it,
+// the same message is returned whether or not email is recognised
+exports.sendResetLink = (req, res, next) => {
+    email = req.body.email
+
+    db.query('SELECT * FROM users_test WHERE email = ?', [ email ], (error, results) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+        if (results.length < 1) {
+            res.render('forgot-password.hbs', { message: 'If that user exists a reset link will be sent via email' })
+            return
+        }
+
+        const user = results[0]
+        const token = makeToken(user.id, user.password)
+
+        const link = `http://localhost:5000/auth/reset-password/${user.id}?token=${token}`
+        // console.log(link)
+        sendResetEmail(email, link)
+        res.render('forgot-password.hbs', { message: 'If that user exists a reset link will be sent via email' })     
+    })
+}
+
+// The page that displays when user clicks the link, verifies the token first,
+// redirects the user to home page if any failure scenario happens
+exports.resetPasswordPage = (req, res, next) => { 
+    const { token } = req.query
+    const id = req.params.id
+    if (!token) {
+        res.status(403)
+        res.redirect('/')
+        return
+    }
+    db.query('SELECT * FROM users_test WHERE id = ?', [ id ], (error, results) => {
+        if (error) {
+            console.log(error)
+        }
+        const user = results[0]
+
+        let decoded
+        try {
+            decoded = jwt.verify(token, process.env.JWT_SECRET)
+        } catch (error) {
+            res.status(403)
+            res.redirect('/')
+            return
+        }
+
+        // check the decoded password with the user's current password, if it doesn't match then user is redirected,
+        // because this means they have already reset their password with this link
+        if (decoded.password != user.password) {
+            return res.redirect('/')
+        }
+
+        res.render('reset-password.hbs', { id: decoded.id })
+    })
+}
+
+// Post method to update user record with new hashed password
+exports.resetPassword = async (req, res) => {
+    const userId = req.params.id
+    const new_password = req.body.password
+    const new_password2 = req.body.password2
+
+    if (new_password != new_password2) {
+        return res.render('reset-password.hbs', { message: 'Passwords do not match' })
+    }
+
+    let hashedPassword = await bcrypt.hash(new_password, 8)
+    db.query(`UPDATE users_test SET ? WHERE id = ${userId}`, { password: hashedPassword })
+    res.render('reset-password.hbs', { success_message: 'Password successfully reset' })
+}
+
+exports.passResetError = (req, res) => {
+    res.render('reset-password.hbs', { message: 'You have already reset your password, please login, or request another link' })
+}
