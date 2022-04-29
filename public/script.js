@@ -1,9 +1,7 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
 function showToast() {
-    var toastLiveExample = document.getElementById('liveToast')
-    var toast = new bootstrap.Toast(toastLiveExample)
-    toast.show()
+    const toastLiveExample = document.getElementById('liveToast');
+    const toast = new bootstrap.Toast(toastLiveExample);
+    toast.show();
 }
-
-    
-
-

@@ -1,23 +1,19 @@
 const express = require('express');
-const session = require('express-session')
-const router = express.Router();
+// const mysql = require('mysql');
 const authController = require('../controllers/auth');
-const Article = require('../models/Article');
 
-const mysql = require('mysql')
-const jwt = require('jsonwebtoken')
-const bcrypt = require('bcryptjs')
+const router = express.Router();
 
-const db = mysql.createConnection({
-    host: process.env.DATABASE_HOST,
-    user: process.env.DATABASE_USER,
-    password: process.env.DATABASE_PASSWORD,
-    database: process.env.DATABASE
-})
+// const db = mysql.createConnection({
+//     host: process.env.DATABASE_HOST,
+//     user: process.env.DATABASE_USER,
+//     password: process.env.DATABASE_PASSWORD,
+//     database: process.env.DATABASE,
+// });
 
 router.get('/', authController.isLoggedIn, (req, res) => {
     res.render('index.hbs', {
-        user: req.user
+        user: req.user,
     });
 });
 
@@ -31,25 +27,22 @@ router.get('/login', (req, res) => {
 
 router.get('/profile', authController.isLoggedIn, (req, res) => {
     if (req.user) {
-        if (req.user.is_auth_verified == 1) {
+        if (req.user.is_auth_verified === 1) {
             res.render('profile.hbs', {
                 user: req.user,
-                auth_activated: true              
+                auth_activated: true,
             });
-        }
-        else if (req.user.is_email_otp_verified) {
+        } else if (req.user.is_email_otp_verified) {
             res.render('profile.hbs', {
                 user: req.user,
-                otp_activated: true              
+                otp_activated: true,
+            });
+        } else {
+            res.render('profile.hbs', {
+                user: req.user,
             });
         }
-        else {
-            res.render('profile.hbs', {
-                user: req.user,            
-            });
-        }     
-    }
-    else {
+    } else {
         res.redirect('/login');
     }
 });
@@ -57,27 +50,25 @@ router.get('/profile', authController.isLoggedIn, (req, res) => {
 router.get('/postArticle', authController.isLoggedIn, (req, res) => {
     if (req.user) {
         res.render('postArticle', {
-            user: req.user
+            user: req.user,
         });
-    }
-    else {
+    } else {
         res.render('blogPosts', {
-            message: 'You need to be logged in to post a new article'
+            message: 'You need to be logged in to post a new article',
         });
     }
 });
 
 router.get('/profile/authenticator-setup', (req, res) => {
-    res.render('authenticator-setup.hbs', {code: ''})
-})
+    res.render('authenticator-setup.hbs', { code: '' });
+});
 
 router.get('/profile/email-otp-setup', (req, res) => {
-    res.render('email-otp-setup.hbs')
-})
+    res.render('email-otp-setup.hbs');
+});
 
 router.get('/forgot-password', (req, res) => {
-    res.render('forgot-password.hbs')  
-})
-
+    res.render('forgot-password.hbs');
+});
 
 module.exports = router;
