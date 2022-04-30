@@ -57,7 +57,7 @@ function saveArticleAndRedirect(path) {
             article = await article.save();
             res.redirect(`/articles/${article.slug}`);
         } catch (e) {
-            res.render(`articles/${path}`, { article });
+            res.render(`articles/${path}`, { article, user: null, message: 'Invalid inputs' });
         }
     };
 }

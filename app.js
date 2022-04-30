@@ -30,8 +30,16 @@ app.use(helmet({
     contentSecurityPolicy: {
         useDefaults: true,
         directives: {
-            'script-src': ["'self'", 'https://www.google.com/recaptcha/', 'https://www.gstatic.com/recaptcha/'],
-            'frame-src': ["'self'", 'https://www.google.com/recaptcha/', 'https://www.gstatic.com/recaptcha/'],
+            'script-src': ["'self'", 'https://www.google.com/recaptcha/', 
+            'https://www.gstatic.com/recaptcha/', 
+            'https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js',
+            'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js',
+        ],
+            'frame-src': ["'self'", 'https://www.google.com/recaptcha/', 
+            'https://www.gstatic.com/recaptcha/', 
+            'https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js',
+            'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js',
+        ],
         },
     },
 }));

@@ -11,7 +11,7 @@
     
     <title>Gym Rat | Home</title>
 </head>
-<body onload="showToast()">
+<body>
     <nav>      
         <div id="header-logo">
             <a href="/"><img id="header-icon" src="/logo.png" alt="dumbbell-icon"></a>
@@ -84,39 +84,6 @@
         </div>
     </div>
 
-    {{!-- Show notification when successfully logged out --}}
-    {{#if just_logged_out}}
-        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-header">
-                    <img src="/logo.png" class="rounded me-2" alt="..." style="width: 20px; height: 20px">
-                    <strong class="me-auto">Gym Rat</strong>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-                <div class="toast-body">
-                    Successfully logged out
-                </div>
-            </div>
-        </div>
-    {{/if}}
-
-    {{!-- Show notification when successfully logged in --}}
-    {{#if just_logged_in}}
-        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-header">
-                    <img src="/logo.png" class="rounded me-2" alt="..." style="width: 20px; height: 20px">
-                    <strong class="me-auto">Gym Rat</strong>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-                <div class="toast-body">
-                    Successfully logged in!
-                </div>
-            </div>
-        </div>
-    {{/if}}
-
-    
     <script src="/script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 </body>
