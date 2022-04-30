@@ -57,8 +57,9 @@ function generateOTP() {
 // Used to validate password against criteria, return true if no errors were found, otherwise return a message
 function passwordValidation(password) {
     if (typeof password !== 'string') {
-        return 'Password is of invalid type';
+        return 'Invalid password';
     }
+
     const isWhitespace = /^(?=.*\s)/;
     if (isWhitespace.test(password)) {
         return 'Password must not contain Whitespaces.';
@@ -238,9 +239,9 @@ exports.login = async (req, res) => {
                 const cookieOptions = {
                     expires: new Date(Date.now + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000),
                     httpOnly: true,
+                    secure: true,
                 };
                 res.cookie('jwt', token, cookieOptions);
-                // res.status(200).redirect('/')
                 res.render('index.hbs', {
                     just_logged_in: true,
                     user: results[0],
