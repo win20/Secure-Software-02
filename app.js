@@ -1,5 +1,6 @@
 // Imports
 const express = require('express');
+const helmet = require('helmet');
 // eslint-disable-next-line no-unused-vars
 const dotenv = require('dotenv').config();
 const mysql = require('mysql');
@@ -24,6 +25,16 @@ const db = mysql.createConnection({
 mongoose.connect('mongodb+srv://win20:201099@cluster0.cvtiy.mongodb.net/blog-posts?retryWrites=true&w=majority', {
     useNewUrlParser: true,
 });
+
+app.use(helmet({
+    contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+            'script-src': ["'self'", 'https://www.google.com/recaptcha/', 'https://www.gstatic.com/recaptcha/'],
+            'frame-src': ["'self'", 'https://www.google.com/recaptcha/', 'https://www.gstatic.com/recaptcha/'],
+        },
+    },
+}));
 
 // Set /public directory to server static resources (images, scripts, css)
 const publicDirectory = path.join(__dirname, './public');

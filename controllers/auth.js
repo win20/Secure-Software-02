@@ -56,6 +56,9 @@ function generateOTP() {
 
 // Used to validate password against criteria, return true if no errors were found, otherwise return a message
 function passwordValidation(password) {
+    if (typeof password !== 'string') {
+        return 'Password is of invalid type';
+    }
     const isWhitespace = /^(?=.*\s)/;
     if (isWhitespace.test(password)) {
         return 'Password must not contain Whitespaces.';
@@ -76,7 +79,7 @@ function passwordValidation(password) {
         return 'Password must contain at least one Digit.';
     }
 
-    const isContainsSymbol = /^(?=.*[~`!@#$%^&*()--+={}\\[\]|\\:;"'<>,.?/_₹])/;
+    const isContainsSymbol = /^(?=.*[~`!@#$%^&*(){}\\[\]|\\"'<>,./_₹])/;
     if (!isContainsSymbol.test(password)) {
         return 'Password must contain at least one special character.';
     }
@@ -150,7 +153,7 @@ exports.register = (req, res) => {
                             email,
                         });
                     }
-                    if (!(/^[a-zA-Z]+$/.test(name))) {
+                    if (!(/^[a-zA-Z]+$/.test(name)) || (typeof name !== 'string')) {
                         return res.render('register.hbs', {
                             message: 'Please enter only a first name and with only letters',
                             name,
@@ -202,6 +205,7 @@ function delay(time) {
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
+        const message = passwordValidation(password);
 
         if (!email || !password) {
             return res.status(400).render('login.hbs', {
@@ -215,6 +219,8 @@ exports.login = async (req, res) => {
                 // equalize the server response times
                 delay(20).then(() => res.status(401).render('login.hbs', { message: 'Email or password is incorrect' }));
                 // res.status(401).render('login.hbs', {message: 'Email or password is incorrect'})
+            } else if (message !== true) {
+                res.status(401).render('login.hbs', { message: 'Email or password is invalid' });
             } else if (!(await bcrypt.compare(password, results[0].password))) {
                 res.status(401).render('login.hbs', { message: 'Email or password is incorrect' });
             } else if (results[0].is_auth_verified === 1) {
@@ -222,9 +228,8 @@ exports.login = async (req, res) => {
                 res.render('auth-validate.hbs', { message: '' });
             } else if (results[0].is_email_otp_verified === 1) {
                 userEmail = email;
-                res.render('email-otp-validate.hbs');
-
                 sendOTP(userEmail);
+                res.render('email-otp-validate.hbs');
             } else {
                 const { id } = results[0];
                 const token = jwt.sign({ id }, process.env.JWT_SECRET, {
