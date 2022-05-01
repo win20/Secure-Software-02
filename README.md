@@ -24,15 +24,19 @@ Since the project is not going to be on an online server we need to start a loca
 ## Main Libraries & Frameworks
 - [Bootstrap](https://getbootstrap.com/) - Framework that allows quicker creation of clean and responsive websites. Used for frontend.
 - [Node.js v16.14.2](https://nodejs.org/en/) - Server-side language used for all the backend code, based on JavaScript.
-- [Express.js](https://expressjs.com/) - The standard library used alongside Node.js.
+- [Express.js](https://expressjs.com/) - The standard library used alongside Node.js to handle server requests and routing.
 - [JWT](https://jwt.io/) - For creating web tokens, used alongside cookies.
 - [Bcryptjs](https://www.npmjs.com/package/bcryptjs) - Allows us to salt and hash passwords, as well as comparing using **timing safe** methods.
 - [Dotenv](https://www.npmjs.com/package/dotenv) - Stores environment variables securely.
 - [Handlebars.js](https://www.npmjs.com/package/handlebars) - Web templating system, contains all the HTML code and allows conditional markdown.
+- [Mongoose](https://www.npmjs.com/package/mongoose) - Handles database for blog posts
+- [Helmet](https://www.npmjs.com/package/helmet) - Allows us to set some security based http headers
+- [Csurf](https://www.npmjs.com/package/csurf) - Used to set CSRF tokens 
+- [Nodemailer](https://nodemailer.com/about/) - Used to send emails to users
+- [Speakeasy](https://www.npmjs.com/package/speakeasy) - Generates code for 2 factor-authentication using email
 
 
 ## Contributors
-
 - Win Barua - qnk19zxu
 - Simon Newton - aaaaaaa
 
