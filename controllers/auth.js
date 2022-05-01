@@ -8,17 +8,12 @@
 const mysql = require('mysql');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-// const async = require('hbs/lib/async');
-// const cookieParser = require('cookie-parser');
 const { promisify } = require('util');
-// const { request, response } = require('express');
 const fetch = require('isomorphic-fetch');
 const speakeasy = require('speakeasy');
 const qrCode = require('qrcode');
 const nodemailer = require('nodemailer');
-// const { resolve } = require('path');
-// const randtoken = require('rand-token');
-// const expressValidator = require('express-validator');
+const { response } = require('express');
 
 // Store current email
 let userEmail;
@@ -145,6 +140,7 @@ exports.register = (req, res) => {
                             message: 'That email is already in use',
                             name,
                             email,
+                            csrfToken: req.csrfToken()
                         });
                     }
                     if (password !== passwordConfirm) {
@@ -152,6 +148,7 @@ exports.register = (req, res) => {
                             message: 'The passwords do not match',
                             name,
                             email,
+                            csrfToken: req.csrfToken()
                         });
                     }
                     if (!(/^[a-zA-Z]+$/.test(name)) || (typeof name !== 'string')) {
@@ -159,6 +156,7 @@ exports.register = (req, res) => {
                             message: 'Please enter only a first name and with only letters',
                             name,
                             email,
+                            csrfToken: req.csrfToken()
                         });
                     }
 
@@ -167,6 +165,7 @@ exports.register = (req, res) => {
                             message,
                             name,
                             email,
+                            csrfToken: req.csrfToken()
                         });
                     }
 
@@ -189,6 +188,7 @@ exports.register = (req, res) => {
                     message: 'Failed Captcha.',
                     name,
                     email,
+                    csrfToken: req.csrfToken()
                 });
             }
         })
@@ -204,53 +204,75 @@ function delay(time) {
 // once logged in a cookie using web tokens is created to store the users data while the session is active.
 // Returns: sends messages to front-end as well as user data if they manage to log in.
 exports.login = async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const message = passwordValidation(password);
 
-        if (!email || !password) {
-            return res.status(400).render('login.hbs', {
-                message: 'Please provide an email and password',
-            });
-        }
+    const responseKey = req.body['g-recaptcha-response'];
+    const secretKey = process.env.CAPTCHA_SECRET;
+    const url = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${responseKey}`;
 
-        // note: sends same message regardless of email failure or password failure or both
-        db.query('SELECT * FROM users_test WHERE email = ?', [email], async (error, results) => {
-            if (results < 1) {
-                // equalize the server response times
-                delay(20).then(() => res.status(401).render('login.hbs', { message: 'Email or password is incorrect' }));
-                // res.status(401).render('login.hbs', {message: 'Email or password is incorrect'})
-            } else if (message !== true) {
-                res.status(401).render('login.hbs', { message: 'Email or password is invalid' });
-            } else if (!(await bcrypt.compare(password, results[0].password))) {
-                res.status(401).render('login.hbs', { message: 'Email or password is incorrect' });
-            } else if (results[0].is_auth_verified === 1) {
-                userEmail = email;
-                res.render('auth-validate.hbs', { message: '' });
-            } else if (results[0].is_email_otp_verified === 1) {
-                userEmail = email;
-                sendOTP(userEmail);
-                res.render('email-otp-validate.hbs');
-            } else {
-                const { id } = results[0];
-                const token = jwt.sign({ id }, process.env.JWT_SECRET, {
-                    expiresIn: process.env.JWT_EXPIRES_IN,
-                });
-                const cookieOptions = {
-                    expires: new Date(Date.now + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000),
-                    httpOnly: true,
-                    secure: true,
-                };
-                res.cookie('jwt', token, cookieOptions);
-                res.render('index.hbs', {
-                    just_logged_in: true,
-                    user: results[0],
+    fetch(url, {
+        method: 'post',
+    })
+        .then ((response) => response.json())
+        .then ((googleResponse) => {
+            if (googleResponse.success === true) {
+                try {
+                    const { email, password } = req.body;
+                    const message = passwordValidation(password);
+            
+                    if (!email || !password) {
+                        return res.status(400).render('login.hbs', {
+                            message: 'Please provide an email and password',
+                            csrfToken: req.csrfToken()
+                        });
+                    }
+            
+                    // note: sends same message regardless of email failure or password failure or both
+                    db.query('SELECT * FROM users_test WHERE email = ?', [email], async (error, results) => {
+                        if (results < 1) {
+                            // equalize the server response times
+                            delay(20).then(() => res.status(401).render('login.hbs', { message: 'Email or password is incorrect', csrfToken: req.csrfToken() }));
+                            // res.status(401).render('login.hbs', {message: 'Email or password is incorrect'})
+                        } else if (message !== true) {
+                            res.status(401).render('login.hbs', { message: 'Email or password is invalid', csrfToken: req.csrfToken() });
+                        } else if (!(await bcrypt.compare(password, results[0].password))) {
+                            res.status(401).render('login.hbs', { message: 'Email or password is incorrect', csrfToken: req.csrfToken() });
+                        } else if (results[0].is_auth_verified === 1) {
+                            userEmail = email;
+                            res.render('auth-validate.hbs', { message: '' });
+                        } else if (results[0].is_email_otp_verified === 1) {
+                            userEmail = email;
+                            sendOTP(userEmail);
+                            res.render('email-otp-validate.hbs');
+                        } else {
+                            const { id } = results[0];
+                            const token = jwt.sign({ id }, process.env.JWT_SECRET, {
+                                expiresIn: process.env.JWT_EXPIRES_IN,
+                            });
+                            const cookieOptions = {
+                                expires: new Date(Date.now + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000),
+                                httpOnly: true,
+                                secure: true,
+                            };
+                            res.cookie('jwt', token, cookieOptions);
+                            res.render('index.hbs', {
+                                just_logged_in: true,
+                                user: results[0],
+                            });
+                        }
+                    });
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+            else {
+                return res.render('login.hbs', {
+                    message: 'Failed Captcha',
+                    csrfToken: req.csrfToken()
                 });
             }
-        });
-    } catch (error) {
-        console.log(error);
-    }
+        })
+        .catch((error) => res.json({ error }));
+    
 };
 
 // Used whenever a page needs to know if the user is logged in or not,
