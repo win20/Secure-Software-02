@@ -38,7 +38,7 @@ Since the project is not going to be on an online server we need to start a loca
 
 ## Contributors
 - Win Barua - qnk19zxu
-- Simon Newton - aaaaaaa
+- Simon Newton - cgt18tru
 
 ## References & credits
 1. [JWT Documentation](https://jwt.io/introduction)
