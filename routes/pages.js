@@ -1,15 +1,7 @@
 const express = require('express');
-// const mysql = require('mysql');
 const authController = require('../controllers/auth');
 
 const router = express.Router();
-
-// const db = mysql.createConnection({
-//     host: process.env.DATABASE_HOST,
-//     user: process.env.DATABASE_USER,
-//     password: process.env.DATABASE_PASSWORD,
-//     database: process.env.DATABASE,
-// });
 
 router.get('/', authController.isLoggedIn, (req, res) => {
     res.render('index.hbs', {
@@ -17,13 +9,13 @@ router.get('/', authController.isLoggedIn, (req, res) => {
     });
 });
 
-router.get('/register', (req, res) => {
-    res.render('register.hbs');
-});
+// router.get('/register', csrfProtection, (req, res) => {
+//     res.render('register.hbs', { csrfToken: req.csrfToken() });
+// });
 
-router.get('/login', (req, res) => {
-    res.render('login.hbs');
-});
+// router.get('/login', (req, res) => {
+//     res.render('login.hbs');
+// });
 
 router.get('/profile', authController.isLoggedIn, (req, res) => {
     if (req.user) {

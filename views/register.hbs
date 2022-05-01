@@ -34,6 +34,7 @@
 
             <div class="card-body">
                 <form action="/auth/register" method="POST">
+                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
                     <div class="mb-3">
                         <label for="name" class="form-label">First Name</label>
                         <input required type="text" class="form-control" id="name" name="name" value="{{#if name}}{{name}}{{/if}}">

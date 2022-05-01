@@ -1,11 +1,24 @@
 const express = require('express');
 
 const authController = require('../controllers/auth');
+var csrf = require('csurf');
+var bodyParser = require('body-parser');
 
 const router = express.Router();
 
-router.post('/register', authController.register);
-router.post('/login', authController.login);
+var csrfProtection = csrf({ cookie: true })
+var parseForm = bodyParser.urlencoded({ extended: false })
+
+router.get('/register', csrfProtection, (req, res) => {
+    res.render('register.hbs', { csrfToken: req.csrfToken() });
+});
+
+router.get('/login', csrfProtection, (req, res) => {
+    res.render('login.hbs', { csrfToken: req.csrfToken() });
+});
+
+router.post('/register', parseForm, csrfProtection, authController.register);
+router.post('/login', parseForm, csrfProtection, authController.login);
 router.get('/logout', authController.logout);
 router.post('/set-authenticator', authController.isLoggedIn, authController.setAuthenticator);
 router.post('/verify-token', authController.isLoggedIn, authController.verifyToken);
