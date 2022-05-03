@@ -12,9 +12,11 @@ Since the project is not going to be on an online server we need to start a loca
 ## How to run the project
 
 1. Open XAMPP and start the Apache and mySQL servers.
-2. Open the command prompt ('cmd').
-3. Navigate to the project folder by using the 'cd' command, eg: **cd C:\path\to\file\Secure-Software-02**.
-4. Connect to the server, type: **npm start**. This should tell you the port of the server and confirm the mySQL connection as shown:
+2. Using a browser, navigate to <a href="http://localhost/phpmyadmin/" target="_blank">http://localhost/phpmyadmin/</a> and click on the 'New' button to create a new database, give it the name 'nodejs-login'.
+3. Now click on this new database and at the top, click the import button to import the users.sql file given in the project folder, this should create a local users table which will be used by the application to store user data. It will also have some sample users in it.
+4. Open the command prompt ('cmd'). Please **do not** use powershell as it didn't work for us when testing.
+5. Navigate to the project folder by using the 'cd' command, eg: **cd C:\path\to\file\Secure-Software-02**.
+6. Connect to the server, type: **npm start**. This should tell you the port of the server and confirm the mySQL connection as shown:
 
   ![Screenshot of results](https://github.com/win20/Secure-Software-02/blob/main/git-imgs/cmd-connect.PNG)
 
