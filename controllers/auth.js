@@ -233,7 +233,7 @@ exports.login = async (req, res) => {
                             delay(20).then(() => res.status(401).render('login.hbs', { message: 'Email or password is incorrect', csrfToken: req.csrfToken() }));
                             // res.status(401).render('login.hbs', {message: 'Email or password is incorrect'})
                         } else if (message !== true) {
-                            res.status(401).render('login.hbs', { message: 'Email or password is invalid', csrfToken: req.csrfToken() });
+                            res.status(401).render('login.hbs', { message: 'Email or password is incorrect', csrfToken: req.csrfToken() });
                         } else if (!(await bcrypt.compare(password, results[0].password))) {
                             res.status(401).render('login.hbs', { message: 'Email or password is incorrect', csrfToken: req.csrfToken() });
                         } else if (results[0].is_auth_verified === 1) {
