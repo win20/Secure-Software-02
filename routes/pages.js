@@ -9,14 +9,6 @@ router.get('/', authController.isLoggedIn, (req, res) => {
     });
 });
 
-// router.get('/register', csrfProtection, (req, res) => {
-//     res.render('register.hbs', { csrfToken: req.csrfToken() });
-// });
-
-// router.get('/login', (req, res) => {
-//     res.render('login.hbs');
-// });
-
 router.get('/profile', authController.isLoggedIn, (req, res) => {
     if (req.user) {
         if (req.user.is_auth_verified === 1) {
